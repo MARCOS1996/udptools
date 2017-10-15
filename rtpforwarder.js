@@ -74,5 +74,4 @@ mqttClient.on('message', function (topic, message) {
       console.log("L: SN="+rtpPacket.getSeqNumber().toString()+" TS="+rtpPacket.getTimestamp().toString()+" from "+info.address+":"+info.port);
       Sender.sendPacket(rtpPacketCopy,rtpPacketCopy.length);
   });
-
 });
