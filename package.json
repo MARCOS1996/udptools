@@ -1,0 +1,24 @@
+{
+  "name": "udptools",
+  "version": "0.1.0",
+  "description": "udptools",
+  "main": "main.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MARCOS1996/udptools.git"
+  },
+  "keywords": [
+    "mqtt",
+    "rtp",
+    "udp"
+  ],
+  "author": "Marcos León",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MARCOS1996/udptools/issues"
+  },
+  "homepage": "https://github.com/MARCOS1996/udptools#readme"
+}
