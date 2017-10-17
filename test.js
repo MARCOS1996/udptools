@@ -1,40 +1,32 @@
 const { spawn } = require('child_process');
 
-var settings = {
-  streamerPort : "5004",
-  viewerPort : "5008"
+test1();
+
+function test1() {
+
+  var settings = {
+    streamerPort : "5004",
+    viewerPort : "5008"
+  };
+
+  console.log("Performing test 1 - rtpforwarder without changing port");
+
+  // Start streamer
+  const streamer = spawn('vlc', ["video.mp4", "--sout", "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{dst=localhost,port="+settings.streamerPort+",mux=ts}"]);
+  console.log("Info: startig streamer at port "+settings.streamerPort);
+  // Start viewer
+  const viewer = spawn('vlc', ["rtp://localhost:"+settings.viewerPort]);
+  console.log("Info: startig viewer at port "+settings.viewerPort);
+  // Start rtpforwarder programm
+  const rtpforwarder = spawn('node', ["rtpforwarder.js"]);
+  console.log("Info: starting forwarder");
+  var waitTill = new Date(new Date().getTime() + 1 * 1000);
+  while(waitTill > new Date()){}
+  // Starting service via mqtt messages
+  const mqtt1 = spawn('mosquitto_pub', ["-p", "1883", "-t", "rtpforwarder", "-m", "start"]);
+  console.log("Info: starting rtpforwarder service via mqtt");
+
 };
-
-// Start streamer
-const streamer = spawn('vlc', ["video.mp4", "--sout", "#transcode{vcodec=h264,acodec=mpga,ab=128,channels=2,samplerate=44100}:rtp{dst=localhost,port="+settings.streamerPort+",mux=ts}"]);
-console.log("Startig streamer at port "+settings.streamerPort);
-
-// Start viewer
-const viewer = spawn('vlc', ["rtp://localhost:"+settings.viewerPort]);
-console.log("Startig viewer at port "+settings.viewerPort);
-
-// Start rtpforwarder programm
-const rtpforwarder = spawn('node', ["rtpforwarder.js"]);
-console.log("Starting forwarder");
-
-var waitTill = new Date(new Date().getTime() + 2 * 1000);
-while(waitTill > new Date()){}
-
-// Starting service via mqtt messages
-const mqtt1 = spawn('mosquitto_pub', ["-p", "1883", "-t", "rtpforwarder", "-m", "start"]);
-console.log("Starting rtpforwarder service via mqtt");
-
-rtpforwarder.stdout.on('data', (data) => {
-  console.log(data.toString());
-});
-
-rtpforwarder.stderr.on('data', (data) => {
-  console.log(`stderr: ${data}`);
-});
-
-rtpforwarder.on('close', (code) => {
-  console.log(`child process exited with code ${code}`);
-});
 
 /*
 console.log("Configuring source port");
