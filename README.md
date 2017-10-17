@@ -2,6 +2,11 @@
 MQTT controlled set of tools to forward packages, send realiable data and get statistics about it.
 # RTP Forwarder - rtpforwarder.js
 
+Required libraries, both available via npm
+
+        rtp-rtcp
+        mqtt
+
 MQTT server configuration to be controlled by:
 
         var mqttClient = mqtt.connect({
