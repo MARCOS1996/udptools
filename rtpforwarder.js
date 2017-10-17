@@ -11,40 +11,49 @@ var mqttClient = mqtt.connect({
   password: '1234'
 });
 
-mqttClient.on('connect', function () {
-  mqttClient.subscribe('rtpforwarder/#')
-});
-
+// source/destination configuration
 var settings = {
   srcPort : "5004",
   dstPort : "5008",
-  dstAddr : "192.168.1.121"
+  dstAddr : "localhost"
 }
 
 var Listener;
 var Sender;
 
+mqttClient.on('connect', function () {
+  mqttClient.subscribe('rtpforwarder/#')
+});
+
 mqttClient.on('message', function (topic, message) {
 
-  if (message.toString().includes("start")){
+  if (topic.toString()=="rtpforwarder" && message.toString()=="start"){ // rtpforwarder stop
 
-    Listener=new RtpSession(settings.srcPort);
-    Sender=new RtpSession(0); // Pick a random port, it won't be used
-    Sender.setRemoteAddress(settings.dstPort,settings.dstAddr);
+    console.log("Configuration: starting forwarder...");
+    Listener=new RtpSession(settings.srcPort); // Create a listener
+    Sender=new RtpSession(0); // Pick a random port, it won't be used, create a sender
+    Sender.setRemoteAddress(settings.dstPort,settings.dstAddr); // set the target for the sender
 
-  }else if (message.toString().includes("stop")) {
+  }else if (topic.toString()=="rtpforwarder" && message.toString()=="stop") { // rtpforwarder stop
 
-    Listener.close();
-    Sender.close();
+    console.log("Configuration: forwarder stopped");
+    if (Listener!=undefined) { // only close if Listener is running
+      Listener.close();
+    }
+    if (Sender!=undefined) { // only close if Listener is running
+      Sender.close();
+    }
 
-  }else if (topic.toString().includes("source")){ // rtpforwarder/source/port
+  }else if (topic.toString()=="rtpforwarder/source/port"){ // rtpforwarder/source/port
 
     console.log("Configuration: source port set to "+message.toString());
-    settings.srcPort = message.toString();
-    Listener.close();
-    Listener=new RtpSession(settings.srcPort);
+    settings.srcPort = message.toString(); // change the global settings
+    if (Listener!=undefined) { // only close if Listener is running
+      Listener.close();
+    }
+    Listener=new RtpSession(settings.srcPort); // create a new Listener
 
-  }else if (topic.toString().includes("target")){
+  }else if (topic.toString().includes("rtpforwarder/target")){
     if (topic.toString().includes("port")){ // rtpforwarder/target/port
 
       console.log("Configuration: target port set to "+message.toString());
@@ -56,7 +65,10 @@ mqttClient.on('message', function (topic, message) {
       settings.dstAddr = message.toString();
 
     }
-    Sender.setRemoteAddress(settings.dstPort,settings.dstAddr);
+
+    if (Sender!=undefined) { // only close if Listener is running
+      Sender.setRemoteAddress(settings.dstPort,settings.dstAddr);
+    }
 
   }else{
 
@@ -71,7 +83,8 @@ mqttClient.on('message', function (topic, message) {
   Listener.on("message",function(msg,info){
       var rtpPacket=new RtpPacket(msg);
       var rtpPacketCopy=rtpPacket.createBufferCopy();
-      console.log("L: SN="+rtpPacket.getSeqNumber().toString()+" TS="+rtpPacket.getTimestamp().toString()+" from "+info.address+":"+info.port);
+      console.log("Packet with SqNumber - "+rtpPacket.getSeqNumber().toString()+" forwarded from "+info.address+":"+info.port+" to "+settings.dstAddr+":"+settings.dstPort);
       Sender.sendPacket(rtpPacketCopy,rtpPacketCopy.length);
   });
+
 });
