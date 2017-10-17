@@ -7,7 +7,7 @@ Required libraries, both available via npm
         rtp-rtcp
         mqtt
 
-MQTT server configuration to be controlled by:
+MQTT server configuration to be controlled by
 
         var mqttClient = mqtt.connect({
                 host: 'localhost',
