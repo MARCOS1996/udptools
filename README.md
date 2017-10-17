@@ -11,9 +11,7 @@ MQTT server configuration to be controlled by:
 
         var mqttClient = mqtt.connect({
                 host: 'localhost',
-                port: 1883,
-                username: 'rtptool',
-                password: '1234'
+                port: 1883
         });
 
 Default configuration for the forwarder
@@ -27,7 +25,6 @@ Default configuration for the forwarder
 Supported MQTT Messages:
 
         rtpforwarder <start/stop>
-
         rtpforwarder/source/port <port>
         rtpforwarder/destination/port <port>
         rtpforwarder/destination/port <address>
