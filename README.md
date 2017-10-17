@@ -21,11 +21,7 @@ Default configuration for the forwarder
 
 Supported MQTT Messages:
 
-To controll the status use
-
         rtpforwarder <start/stop>
-
-To modify the default values of the settings object
 
         rtpforwarder/source/port <port>
         rtpforwarder/destination/port <port>
