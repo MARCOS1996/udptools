@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 
-test1();
+test1(); // Perform test 1
 
 function test1() {
 
@@ -29,8 +29,8 @@ function test1() {
 };
 
 /*
-console.log("Configuring source port");
-const mqtt2 = spawn('mosquitto_pub', ["-h", "localhost", "-p", "1883", "rtpforwarder", "-m", "start"]);
+
+used shell commands:
 
 mosquitto_pub -h "localhost" -p "1883" -t "rtpforwarder" -m "start"
 mosquitto_pub -h "localhost" -p "1883" -t "rtpforwarder" -m "stop"
