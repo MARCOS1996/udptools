@@ -5,8 +5,6 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 Used to perform various test of the implemented tools
 
-Usage:
-
         $ node test.js <test number>
         
 Test 1: Simple port forwarding using vlc to stream data and visualize it (uses transcodification), tested on linux.
