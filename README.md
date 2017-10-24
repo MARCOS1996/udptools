@@ -32,7 +32,7 @@ Configuration via JSON object containing:
 The initial configuration can be set by:
 
         Programm arguments - $ node streamForwarder.js -c '{ "mqttBroker":"localhost", ... ,  "dstAddr":"192.168.1.4"}'
-        Text file - $ node streamForwarder.js -c '/home/file.txt'
+        Text file - $ node streamForwarder.js -f '/home/file.txt'
         Database - (not implemented)
         
 
