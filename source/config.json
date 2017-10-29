@@ -1,0 +1,8 @@
+{
+"mqttBroker":"192.168.1.1",
+"srcType":"rtp",
+"srcPort":"5004",
+"dstType":"udp",
+"dstPort":"5008",
+"dstAddr":"192.168.1.4"
+}

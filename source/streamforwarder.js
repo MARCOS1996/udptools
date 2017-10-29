@@ -1,7 +1,7 @@
 var mqtt = require('mqtt')
-
 var RtpSession=require("rtp-rtcp").RtpSession;
 var RtpPacket=require("rtp-rtcp").RtpPacket;
+var fs = require('fs')
 
 configuration = {
   mqttBroker : undefined,
@@ -12,136 +12,155 @@ configuration = {
   dstAddr : undefined,
 };
 
-var Listener;
-var Sender;
+var Listener=new RtpSession(0);
+var Sender=new RtpSession(0);
 
-if (parseAruments()){ // if pase arguments was succesfull, do something
+if (parseAruments()) {
   console.log("\nCONFIGURED STATE\n");
 
   var mqttClient = mqtt.connect({
-    host: configuration.mqttBroker,
+    host: 'localhost',
     port: 1883,
-    username: 'rtptool',
-    password: '1234'
   });
 
-  mqttClient.on('connect', function () {
-    mqttClient.subscribe('rtpforwarder/#')
+  console.log("  Config->Subscribed||Working offilne - triyng to connect with the broker");
+
+  /*
+  Decide is broker is up and running or not, now forcing to running
+  */
+  console.log("  Config->Subscribed||Working offilne - broker is up");
+
+  mqttClient.on('connect', function (connack) { // subscribe to component topic
+    console.log("\nSUBSCRIBED STATE\n");
+    mqttClient.subscribe('streamforwarder/#');
+    console.log("  Sub->Sub - requesting updated configuration");
+    mqttClient.publish('streamforwarder', 'get_config');
   });
 
   mqttClient.on('message', function (topic, message) {
-    if (configuration.srcType=="rtp" && configuration.dstType=="rtp") {
-      rtp2rtp(topic, message);
-    }else {
-      console.log("not implemented");
+    if (topic == "streamforwarder/configuration") { // try to update config
+      console.log("  Sub->StandbyOnline - Updating configuration");
+      if (validateConfig(message)) { // config updated without problems
+        console.log("  Sub->Sub - config updated");
+        console.log("\nSUBSCRIBED STATE\n");
+      }else { // config not updated
+        console.log("\n  Sub->Sub - config not updated");
+        console.log("\nSUBSCRIBED STATE\n");
+      }
+    } else if (message != "get_config") { // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
+      if (configuration.srcType=="rtp" && configuration.dstType=="rtp") {
+        rtp2rtp(message.toString());
+      }else {
+        console.log("ERROR - forwarding from "+configuration.srcType+" to "+configuration.dstType+" not implemented yet");
+        process.exit(1);
+      }
     }
   });
 
-  console.log("...working really hard...");
-
-
+  mqttClient.on('error', function(error){
+    console.log(error);
+    mqttClient.end();
+  });
 
 }else {
   process.exit(1);
-}
+};
 
-function rtp2rtp(topic, message){
-
-  if (topic.toString()=="rtpforwarder" && message.toString()=="start"){ // rtpforwarder stop
-
-    console.log("Configuration: starting forwarder...");
-    Listener=new RtpSession(configuration.srcPort); // Create a listener
-    Sender=new RtpSession(0); // Pick a random port, it won't be used, create a sender
-    Sender.setRemoteAddress(configuration.dstPort,configuration.dstAddr); // set the target for the sender
-
-  }else if (topic.toString()=="rtpforwarder" && message.toString()=="stop") { // rtpforwarder stop
-
-    console.log("Configuration: forwarder stopped");
-    if (Listener!=undefined) { // only close if Listener is running
-      Listener.close();
-    }
-    if (Sender!=undefined) { // only close if Listener is running
-      Sender.close();
-    }
-
-  }else if (topic.toString()=="rtpforwarder/source/port"){ // rtpforwarder/source/port
-
-    console.log("Configuration: source port set to "+message.toString());
-    configuration.srcPort = message.toString(); // change the global configuration
-    if (Listener!=undefined) { // only close if Listener is running
-      Listener.close();
-    }
-    Listener=new RtpSession(configuration.srcPort); // create a new Listener
-
-  }else if (topic.toString().includes("rtpforwarder/target")){
-    if (topic.toString().includes("port")){ // rtpforwarder/target/port
-
-      console.log("Configuration: target port set to "+message.toString());
-      configuration.dstPort = message.toString();
-
-    }else{ // rtpforwarder/target/address
-
-      console.log("Configuration: target address port set to "+message.toString());
-      configuration.dstAddr = message.toString();
-
-    }
-
-    if (Sender!=undefined) { // only close if Listener is running
-      Sender.setRemoteAddress(configuration.dstPort,configuration.dstAddr);
-    }
-
-  }else{
-
-    console.log("MQTT Error: "+topic.toString()+" does not exist");
-
+function rtp2rtp(command){
+  switch(command) {
+    case "start":
+      console.log("  Sub->Forw - MQTT Recevied start");
+      console.log("\nFORWARDING STATE\n");
+      Listener=new RtpSession(configuration.srcPort); // Create a listener
+      Sender=new RtpSession(0); // Pick a random port, it won't be used, create a sender
+      Sender.setRemoteAddress(configuration.dstPort,configuration.dstAddr); // set the target for the sender
+      break;
+    case "stop":
+      console.log("  Forw->Sub - MQTT Recevied stop");
+      console.log("\nSUBSCRIBED STATE\n");
+      if (Listener!=undefined) { // only close if Listener is running
+        Listener.close();
+      }
+      if (Sender!=undefined) { // only close if Listener is running
+        Sender.close();
+      }
+      break;
+    default:
+      console.log("ERROR bad command");
   }
 
   Listener.on("listening",function(){
-      console.log("Status: RTP server is running on port: "+configuration.srcPort);
+      console.log("    status: RTP server is running on port: "+configuration.srcPort);
   });
 
   Listener.on("message",function(msg,info){
       var rtpPacket=new RtpPacket(msg);
       var rtpPacketCopy=rtpPacket.createBufferCopy();
-      console.log("Packet with SqNumber - "+rtpPacket.getSeqNumber().toString()+" forwarded from "+info.address+":"+info.port+" to "+configuration.dstAddr+":"+configuration.dstPort);
+      console.log("    status: Packet with SqNumber - "+rtpPacket.getSeqNumber().toString()+" forwarded from "+info.address+":"+info.port+" to "+configuration.dstAddr+":"+configuration.dstPort);
       Sender.sendPacket(rtpPacketCopy,rtpPacketCopy.length);
     });
 };
 
-// Parse arguments from command line, true if the configuration is valid
 function parseAruments() {
   var type = process.argv[2];
   console.log("\nRUNNING STATE\n");
   switch(type) {
     case "-c":
-      console.log("  Run->Config - Recevied config from argments");
-      return validateConfig(process.argv[3]);
-      break;
-    case "-f":
-      console.log("  Run->Config - Recevied config from file: "+process.argv[3]);
-      return false // not yet supported
-      break;
-    case "-d":
-      console.log("  Run->Config - Recevied config from database: "+process.argv[3]);
-      return false // not yet supported
+      console.log("  Run->Config - Recevied config from file "+process.argv[3]);
+      var fileData = fs.readFileSync(process.argv[3], 'utf8');
+      console.log("  Run->Config - Validating configuration");
+      if (!validateConfig(fileData)) {
+        return false;
+      }
       break;
     case "-h":
       printHelp();
       return false;
-      break;
     default:
       console.log("Error - Wrong arguments, type -h for help");
       return false;
   }
+  return true;
 };
 
-/*
-Example of a valid configuration: '{ "mqttBroker":"localhost", "srcType":"rtp", "srcPort":"5004", "dstType":"udp", "dstPort":"5008", "dstAddr":"192.168.1.4"}'
-*/
+function updateConfig(config) {
+  var tmpConfig = JSON.parse(config);
+  if (tmpConfig.srcType) {
+    console.log("    Source type: "+tmpConfig.srcType);
+    if (tmpConfig.srcPort) {
+      console.log("    Source port: "+tmpConfig.srcPort);
+      if (tmpConfig.dstType) {
+        console.log("    Destination type: "+tmpConfig.dstType);
+        if (tmpConfig.dstPort) {
+          console.log("    Destination port: "+tmpConfig.dstPort);
+          if (tmpConfig.dstAddr) {
+            console.log("    Destination address: "+tmpConfig.dstAddr);
+          } else {
+            console.log("    Error on destination address");
+            return false;
+          }
+        } else {
+          console.log("    Error on destination port");
+          return false;
+        }
+      } else {
+        console.log("    Error on destination type");
+        return false;
+      }
+    } else {
+      console.log("    Error on source port");
+      return false;
+    }
+  } else {
+    console.log("    Error on source type");
+    return false;
+  }
+  configuration = tmpConfig;
+  return true;
+};
 
 function validateConfig(config) {
   var tmpConfig = JSON.parse(config);
-  console.log("  Run->Config - Validating: "+config);
   if (tmpConfig.mqttBroker) {
     console.log("\n    MQTT Broker: "+tmpConfig.mqttBroker);
     if (tmpConfig.srcType) {
@@ -180,9 +199,4 @@ function validateConfig(config) {
   }
   configuration = tmpConfig;
   return true;
-};
-
-// Print the help of the programm
-function printHelp() {
-  console.log("I'm the help");
 };
