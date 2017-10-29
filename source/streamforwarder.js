@@ -41,7 +41,7 @@ if (parseAruments()) {
     if (topic == "streamforwarder/configuration") { // try to update config
       console.log("  Sub->StandbyOnline - Updating configuration");
       if (validateConfig(message)) { // config updated without problems
-        console.log("  Sub->Sub - config updated");
+        console.log("\n  Sub->Sub - config updated");
         console.log("\nSUBSCRIBED STATE\n");
       }else { // config not updated
         console.log("\n  Sub->Sub - config not updated");
@@ -63,6 +63,7 @@ if (parseAruments()) {
   });
 
 }else {
+  console.log("ERROR - Wrong arguments");
   process.exit(1);
 };
 
