@@ -5,31 +5,43 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 Used to perform various test of the implemented tools
 
-# RTP Forwarder - rtpforwarder.js
+        $ node test.js <test number>
+        
+Test 1: Simple port forwarding using vlc to stream data and visualize it (uses transcodification), tested on linux.
+
+# Stream Forwarder - streamForwarder.js
 
 Required libraries, both available via npm
 
         rtp-rtcp
         mqtt
 
-MQTT server configuration to be controlled by
+Configuration via JSON object containing:
 
-        var mqttClient = mqtt.connect({
-                host: 'localhost',
-                port: 1883
-        });
-
-Default configuration for the forwarder
-
-        var settings = {
-          srcPort : "5004",
-          dstPort : "5008",
-          dstAddr : "192.168.1.121"
+        { 
+        "mqttBroker":"localhost", 
+        "srcType":"rtp", 
+        "srcPort":"5004", 
+        "dstType":"udp", 
+        "dstPort":"5008", 
+        "dstAddr":"192.168.1.4"
         }
 
-Supported MQTT Messages:
+The initial configuration can be set by:
 
-        rtpforwarder <start/stop>
-        rtpforwarder/source/port <port>
-        rtpforwarder/destination/port <port>
-        rtpforwarder/destination/port <address>
+        Programm arguments - $ node streamForwarder.js -c '{ "mqttBroker":"localhost", ... ,  "dstAddr":"192.168.1.4"}'
+        Text file - $ node streamForwarder.js -f '/home/file.txt'
+        Database - (not implemented)
+        
+
+Supported MQTT messages for changing configuration when the programm is running
+
+        streamForwarder <start/stop>
+        streamForwarder/source/port <port>
+        streamForwarder/destination/port <port>
+        streamForwarder/destination/port <address>
+        
+next to be added:
+
+        streamForwarder/source/type <rtp/udp>
+        streamForwarder/destination/type <rtp/udp>
