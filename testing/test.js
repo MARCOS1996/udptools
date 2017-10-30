@@ -18,7 +18,7 @@ function test1() {
   const viewer = spawn('vlc', ["rtp://localhost:"+settings.viewerPort]);
   console.log("Info: startig viewer at port "+settings.viewerPort);
   // Start rtpforwarder programm
-  const streamforwarder = spawn('node', ["../source/streamforwarder.js", "-c", "../source/config.json"]);
+  const streamforwarder = spawn('nodejs', ["../source/streamforwarder.js", "-c", "../source/config.json"]);
   console.log("TEST - 1 - Info: starting forwarder");
   waitMillis(1500);
   // Configuring service via mqtt messages
