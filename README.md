@@ -15,7 +15,7 @@ Install the requiered packages
 Clone the repository
 
         $ git clone https://github.com/MARCOS1996/udptools -b working
-        
+
 Download the needed dependencies
 
         $ cd udptools
@@ -24,13 +24,13 @@ Download the needed dependencies
 Run the stream frowarder test
 
         $ node /test/sf_test.js
-        
+
 # Component Controller - ccontroller.js
 
 Required libraries, available via npm
 
         mqtt
-        
+
 Running method
 
         $ node componentcontroller.js -ba <broker's address> -bp <broker's port>
@@ -49,11 +49,11 @@ Required libraries, both available via npm
 
         rtp-rtcp
         mqtt
-        
+
 Running method
 
         $ node streamfrowarder.js -c <config_file>.json
-        
+
 Configuration file example
 
         {
@@ -64,12 +64,12 @@ Configuration file example
         "dstPort":"5008",
         "dstAddr":"192.168.1.121"
         }
-        
+
 MQTT API
 
         streamforwarder <start/stop>
-        streamforwarder/configuration <json_object> - Like the one shown previously
-        
+        streamforwarder/configuration <json_object> - Json object like the one shown previously
+
 To make changes in the configuration take effect, you must restart the service with start/stop
 
 Dev status: Only supports RTP->RTP and if the broker is not online waits for it.

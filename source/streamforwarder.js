@@ -28,6 +28,7 @@ if (parseAruments()) {
   /*
   Decide is broker is up and running or not, now forcing to running
   */
+
   console.log("  Config->Subscribed||Working offilne - broker is up");
 
   mqttClient.on('connect', function (connack) { // subscribe to component topic
@@ -97,7 +98,7 @@ function rtp2rtp(command){
   Listener.on("message",function(msg,info){
       var rtpPacket=new RtpPacket(msg);
       var rtpPacketCopy=rtpPacket.createBufferCopy();
-      console.log("    status: Packet with SqNumber - "+rtpPacket.getSeqNumber().toString()+" forwarded from "+info.address+":"+info.port+" to "+configuration.dstAddr+":"+configuration.dstPort);
+      //console.log("    status: Packet with SqNumber - "+rtpPacket.getSeqNumber().toString()+" forwarded from "+info.address+":"+info.port+" to "+configuration.dstAddr+":"+configuration.dstPort);
       Sender.sendPacket(rtpPacketCopy,rtpPacketCopy.length);
     });
 };
