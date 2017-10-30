@@ -3,7 +3,7 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 # Getting started on ubuntu/linux
 
-Install nodejs 8.X and npm 5.X forom offical page
+Install nodejs 8.X and npm 5.X
 
         $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
         $ sudo apt-get install nodejs
