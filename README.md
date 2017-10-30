@@ -3,9 +3,13 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 # Getting started on ubuntu/linux
 
+Install nodejs 8.X and npm 5.X forom offical page
+
+        https://nodejs.org/es/download/current/
+
 Install the requiered packages
 
-        $ sudo apt-get install nodejs npm mosquitto mosquitto-clients vlc
+        $ sudo apt-get install mosquitto mosquitto-clients vlc
 
 Clone the repository
 
