@@ -5,7 +5,8 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 Install nodejs 8.X and npm 5.X forom offical page
 
-        https://nodejs.org/es/download/current/
+        $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+        $ sudo apt-get install nodejs
 
 Install the requiered packages
 
