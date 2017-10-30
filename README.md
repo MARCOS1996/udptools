@@ -5,7 +5,7 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 Install the requiered packages
 
-        $ sudo apt-get install node npm mosquitto mosquitto-clients vlc
+        $ sudo apt-get install nodejs npm mosquitto mosquitto-clients vlc
 
 Clone the repository
 
