@@ -3,31 +3,48 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
 
 # Getting started
 
-Install Platform
+1. Install Platform
 
-        Linux - Debian
-        
-        Install nodejs 8.X and npm 5.X
-          $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-          $ sudo apt-get install nodejs
+  Install nodejs 8.X and npm 5.X
 
-        Install the requiered packages
-          $ sudo apt-get install mosquitto mosquitto-clients vlc
+    Linux - Debian
+      $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+      $ sudo apt-get install nodejs
 
-Clone the repository
+    Windows & Mac
+      Download from https://nodejs.org/es/download/current/
 
-        $ git clone https://github.com/MARCOS1996/udptools -b working
+  Download or clone the repository
+    $ git clone https://github.com/MARCOS1996/udptools -b working
 
-Download the needed dependencies
+  Run npm install in the project folder to insall the requiered libraries
 
-        $ cd udptools
-        $ npm install
+2. Choose a broker
 
-Run the stream frowarder test
+  Option A - Mosquitto - Lightweight and not scalable, suitable for small environments
 
-        $ node /test/sf_test.js
+    Linux - Avaliable via apt-get or yum
+    Windows and Mac see official page https://mosquitto.org/download/
 
-# Component Controller - ccontroller.js
+  Option B - VerneMQ - Scalable and production ready
+
+    Avaliable only for linux, see installation and setup guide on /docs/VerneMQSetup.txt
+
+3. Run the plaform
+
+  <needs yo be documented>
+
+# Platform Controller - pcontroller.js
+
+  Required libraries, available via npm
+
+          mqtt
+
+  Running method
+
+          $ node pcontroller.js -ba <broker's address> -bp <broker's port>
+
+# Database Manager - dbmanager.js
 
 Required libraries, available via npm
 
@@ -35,13 +52,15 @@ Required libraries, available via npm
 
 Running method
 
-        $ node componentcontroller.js -ba <broker's address> -bp <broker's port>
-
-This component is the one that controls all other tools, is listening all mqtt messages and depending on the topic and the messages knows what is being requested.
-
-When a component initializes and connects with the broker, tries to get the previous or more updated configuration. The component send the message "get_config" using their own topic and the component controller gets this config from the database and forwards it to the component.
+        $ node dbmanager.js -ba <broker's address> -bp <broker's port>
 
 The database is not ready yet and the component controller sends a hardcoded config.
+
+# Test Tool - test.js
+
+Used to perform various test of the implemented tools
+
+        Test 1 - Tests the Stream Forwarder without using the controller, sends a specific config for local test. Now uses              transcodification, needs to be changed.
 
 # Stream Forwarder - streamforwarder.js
 
@@ -75,9 +94,3 @@ MQTT API
 To make changes in the configuration take effect, you must restart the service with start/stop
 
 Dev status: Only supports RTP->RTP and if the broker is not online waits for it.
-
-# Test Tool - test.js
-
-Used to perform various test of the implemented tools
-
-        Test 1 - Tests the Stream Forwarder without using the controller, sends a specific config for local test. Now uses              transcodification, needs to be changed.

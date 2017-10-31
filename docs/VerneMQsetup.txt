@@ -1,0 +1,54 @@
+MQTT Broker cluster setup on Debian Linux
+
+Node 01 Lubuntu 16.04.3 LTS (Xenial Xerus x64) 192.168.74.140/24
+
+  1. Download & install the lastest version from VerneMQ offical page - https://vernemq.com/downloads/index.html
+
+    $ sudo dpkg -i (package downloaded from vernemq page).deb
+
+  2. Configure VerneMQ
+    $ sudo nano /etc/vernemq/vernemq.conf
+      listener.tcp.default = 192.168.74.140:1883
+    $ sudo vmq-passwd -c /etc/vernemq/vmq.passwd test01
+      use password “test”
+    $ sudo nano /etc/vernemq/vernemq.conf
+      listener.vmq.clustering = 192.168.74.140:44053
+      distributed_cookie = <what you want>
+      nodename = Node01@192.168.74.140
+      allow_register_during_netsplit = on
+      allow_publish_during_netsplit = on
+      allow_subscribe_during_netsplit = on
+      allow_unsubscribe_during_netsplit = on
+
+  3. Join the cluster
+    $ sudo vernemq start
+    $ sudo vmq-admin cluster show
+      Should only show this node
+
+Node 02 Lubuntu 16.04.3 LTS (Xenial Xerus x64) 192.168.74.143/24
+
+  1. Download & install the lastest version from VerneMQ offical page - https://vernemq.com/downloads/index.html
+
+    $ sudo dpkg -i (package downloaded from vernemq page).deb
+
+  2. Configure VerneMQ
+    $ sudo nano /etc/vernemq/vernemq.conf
+      listener.tcp.default = 192.168.74.140:1883
+    $ sudo vmq-passwd -c /etc/vernemq/vmq.passwd test01
+      use password “test”
+    $ sudo nano /etc/vernemq/vernemq.conf
+      listener.vmq.clustering = 192.168.74.140:44053
+      distributed_cookie = <what you want>
+      nodename = Node02@192.168.74.143
+      allow_register_during_netsplit = on
+      allow_publish_during_netsplit = on
+      allow_subscribe_during_netsplit = on
+      allow_unsubscribe_during_netsplit = on
+
+  3. Join the cluster
+    $ sudo vernemq start
+    $ vmq-admin cluster join discovery-node=Node01@192.168.74.140
+    $ sudo vmq-admin cluster show
+      Should say “True” in both nodes
+
+Tip - With this configuration you should use the user/password test01/test in the mqtt connection. This is not implemented yet.
