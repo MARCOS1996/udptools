@@ -1,16 +1,18 @@
-# UDP Tools
-MQTT controlled set of tools to forward packages, send realiable data and get statistics about it.
+# Realtime Stream Distribution Platform
+MQTT controlled set of tools to forward packages, send realiable data and get statistics about realtime streams.
 
-# Getting started on ubuntu/linux
+# Getting started
 
-Install nodejs 8.X and npm 5.X
+Install Platform
 
-        $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-        $ sudo apt-get install nodejs
+        Linux - Debian
+        
+        Install nodejs 8.X and npm 5.X
+          $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+          $ sudo apt-get install nodejs
 
-Install the requiered packages
-
-        $ sudo apt-get install mosquitto mosquitto-clients vlc
+        Install the requiered packages
+          $ sudo apt-get install mosquitto mosquitto-clients vlc
 
 Clone the repository
 
