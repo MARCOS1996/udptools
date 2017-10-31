@@ -17,7 +17,7 @@ MQTT controlled set of tools to forward packages, send realiable data and get st
   Download or clone the repository
     $ git clone https://github.com/MARCOS1996/udptools -b working
 
-  Run npm install in the project folder to insall the requiered libraries
+  Run npm install in the project folder to install the requiered libraries
 
 2. Choose a broker
 

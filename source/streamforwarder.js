@@ -5,6 +5,7 @@ var fs = require('fs')
 
 configuration = {
   mqttBroker : undefined,
+  mqttPort : undefined,
   srcType : undefined,
   srcPort : undefined,
   dstType : undefined,
@@ -19,8 +20,8 @@ if (parseAruments()) {
   console.log("\nCONFIGURED STATE\n");
 
   var mqttClient = mqtt.connect({
-    host: 'localhost',
-    port: 1883,
+    host: mqttBroker,
+    port: mqttPort,
   });
 
   console.log("  Config->Subscribed||Working offilne - triyng to connect with the broker");
@@ -125,80 +126,38 @@ function parseAruments() {
   return true;
 };
 
-function updateConfig(config) {
-  var tmpConfig = JSON.parse(config);
-  if (tmpConfig.srcType) {
-    console.log("    Source type: "+tmpConfig.srcType);
-    if (tmpConfig.srcPort) {
-      console.log("    Source port: "+tmpConfig.srcPort);
-      if (tmpConfig.dstType) {
-        console.log("    Destination type: "+tmpConfig.dstType);
-        if (tmpConfig.dstPort) {
-          console.log("    Destination port: "+tmpConfig.dstPort);
-          if (tmpConfig.dstAddr) {
-            console.log("    Destination address: "+tmpConfig.dstAddr);
-          } else {
-            console.log("    Error on destination address");
-            return false;
-          }
-        } else {
-          console.log("    Error on destination port");
-          return false;
-        }
-      } else {
-        console.log("    Error on destination type");
-        return false;
-      }
-    } else {
-      console.log("    Error on source port");
-      return false;
-    }
-  } else {
-    console.log("    Error on source type");
-    return false;
-  }
-  configuration = tmpConfig;
-  return true;
-};
-
 function validateConfig(config) {
   var tmpConfig = JSON.parse(config);
+
   if (tmpConfig.mqttBroker) {
+    configuration.mqttBroker = tmpConfig.mqttBroker;
     console.log("\n    MQTT Broker: "+tmpConfig.mqttBroker);
-    if (tmpConfig.srcType) {
-      console.log("    Source type: "+tmpConfig.srcType);
-      if (tmpConfig.srcPort) {
-        console.log("    Source port: "+tmpConfig.srcPort);
-        if (tmpConfig.dstType) {
-          console.log("    Destination type: "+tmpConfig.dstType);
-          if (tmpConfig.dstPort) {
-            console.log("    Destination port: "+tmpConfig.dstPort);
-            if (tmpConfig.dstAddr) {
-              console.log("    Destination address: "+tmpConfig.dstAddr);
-            } else {
-              console.log("    Error on destination address");
-              return false;
-            }
-          } else {
-            console.log("    Error on destination port");
-            return false;
-          }
-        } else {
-          console.log("    Error on destination type");
-          return false;
-        }
-      } else {
-        console.log("    Error on source port");
-        return false;
-      }
-    } else {
-      console.log("    Error on source type");
-      return false;
-    }
-  }else {
-    console.log("    Error on mqtt broker");
-    return false;
   }
-  configuration = tmpConfig;
+  if (tmpConfig.mqttPort) {
+    configuration.mqttPort = tmpConfig.mqttPort;
+    console.log("\n    MQTT Broker: "+tmpConfig.mqttPort);
+  }
+  if (tmpConfig.srcType) {
+    configuration.srcType = tmpConfig.srcType;
+    console.log("    Source type: "+tmpConfig.srcType);
+  }
+  if (tmpConfig.srcPort) {
+    configuration.srcPort = tmpConfig.srcPort;
+    console.log("    Source port: "+tmpConfig.srcPort);
+  }
+  if (tmpConfig.dstType) {
+    configuration.dstType = tmpConfig.dstType;
+    console.log("    Destination type: "+tmpConfig.dstType);
+  }
+  if (tmpConfig.dstPort) {
+    configuration.dstPort = tmpConfig.dstPort;
+    console.log("    Destination port: "+tmpConfig.dstPort);
+  }
+  if (tmpConfig.dstAddr) {
+    configuration.dstAddr = tmpConfig.dstAddr;
+    console.log("    Destination address: "+tmpConfig.dstAddr);
+  }
+
+  // do some validations
   return true;
 };
