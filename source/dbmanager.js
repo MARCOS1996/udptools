@@ -1,3 +1,10 @@
+/*
+
+This components listens on the /configuration/# topic, where the rest
+of components will request their more updated configuration
+
+*/
+
 var mqtt = require('mqtt')
 
 configuration = {
@@ -5,30 +12,41 @@ configuration = {
   mqttPort : undefined,
 };
 
+console.log("\nRUNNING STATE\n");
+
 if (parseAruments()) {
+  console.log("  Run->Config - Actual configuration: \n");
+  console.log("    mqttBroker:"+configuration.mqttBroker);
+  console.log("    mqttPort:"+configuration.mqttPort);
+  console.log("\nCONFIGURED STATE\n");
   var mqttClient = mqtt.connect({
-    host: mqttBroker,
-    port: mqttPort,
+    host: configuration.mqttBroker,
+    port: configuration.mqttPort,
   });
+  console.log("\CONNECTED STATE\n");
 }else {
   console.log("ERROR - Wrong arguments");
   process.exit(1);
 }
 
 mqttClient.on('connect', function () {
-  mqttClient.subscribe('#');
+  mqttClient.subscribe(['configuration','streamforwarder/configuration']);
+  console.log("  Subscribed to 'configuration' for requests");
+  console.log("  Subscribed to 'streamforwarder/configuration' for saving configs in db");
 })
 
 mqttClient.on('message', function (topic, message) {
-  // message is Buffer
-  if (message.toString() == "get_config") {
-    mqttClient.publish(topic.toString()+"/configuration", provideConfig(topic.toString()));
+
+  console.log("MQTT Recevied: "+topic.toString()+" "+message.toString());
+
+  if (topic.toString() == "configuration") { // send configuration
+    mqttClient.publish(message.toString()+"/configuration", provideConfig(message.toString()));
+    console.log("MQTT Sent: "+message.toString()+"/configuration"+" "+provideConfig(message.toString()));
+  }else { // save config in db
+    console.log("config saved in db");
   }
+
 })
-
-//var stopic = topic.toString().split("/")
-
-// mqttClient.publish(topic.toString()+"/configuration", provideConfig(topic.toString()))
 
 function provideConfig(component){
   switch (component) {
@@ -46,10 +64,9 @@ function getConfigDB(component){
 
 // correct arguments: -ba "localhost" -bp "1883"
 function parseAruments() { // needs improvemts
-  console.log(process.argv);
   if (process.argv[2]=="-ba" && process.argv[4]=="-bp") {
-    mqttBroker = process.argv[3];
-    mqttPort = process.argv[5];
+    configuration.mqttBroker = process.argv[3];
+    configuration.mqttPort = process.argv[5];
   }else {
     return false;
   }

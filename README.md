@@ -54,6 +54,14 @@ Running method
 
         $ node dbmanager.js -ba <broker's address> -bp <broker's port>
 
+MQTT API
+
+        configuration/get <component> // To request config
+        <component>/configuration <updated_config in json format> // To receive the response
+
+This components listens on the /configuration/# topic, where the rest
+of components will request their more updated configuration
+
 The database is not ready yet and the component controller sends a hardcoded config.
 
 # Test Tool - test.js

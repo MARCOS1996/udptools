@@ -1,6 +1,6 @@
 {
-"mqttBroker":"192.168.1.1",
-"mqttPort":"1338",
+"mqttBroker":"localhost",
+"mqttPort":"1883",
 "srcType":"rtp",
 "srcPort":"5004",
 "dstType":"udp",

@@ -20,8 +20,8 @@ if (parseAruments()) {
   console.log("\nCONFIGURED STATE\n");
 
   var mqttClient = mqtt.connect({
-    host: mqttBroker,
-    port: mqttPort,
+    host: configuration.mqttBroker,
+    port: configuration.mqttPort,
   });
 
   console.log("  Config->Subscribed||Working offilne - triyng to connect with the broker");
@@ -36,7 +36,7 @@ if (parseAruments()) {
     console.log("\nSUBSCRIBED STATE\n");
     mqttClient.subscribe('streamforwarder/#');
     console.log("  Sub->Sub - requesting updated configuration");
-    mqttClient.publish('streamforwarder', 'get_config');
+    mqttClient.publish('configuration', 'streamforwarder');
   });
 
   mqttClient.on('message', function (topic, message) {
@@ -49,7 +49,7 @@ if (parseAruments()) {
         console.log("\n  Sub->Sub - config not updated");
         console.log("\nSUBSCRIBED STATE\n");
       }
-    } else if (message != "get_config") { // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
+    } else { // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
       if (configuration.srcType=="rtp" && configuration.dstType=="rtp") {
         rtp2rtp(message.toString());
       }else {
@@ -135,7 +135,7 @@ function validateConfig(config) {
   }
   if (tmpConfig.mqttPort) {
     configuration.mqttPort = tmpConfig.mqttPort;
-    console.log("\n    MQTT Broker: "+tmpConfig.mqttPort);
+    console.log("    MQTT Broker: "+tmpConfig.mqttPort);
   }
   if (tmpConfig.srcType) {
     configuration.srcType = tmpConfig.srcType;
