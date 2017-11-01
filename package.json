@@ -23,6 +23,7 @@
   "homepage": "https://github.com/MARCOS1996/udptools#readme",
   "dependencies": {
     "mqtt": "^2.13.1",
+    "node-schedule": "^1.2.5",
     "rtp-rtcp": "0.0.2"
   }
 }
