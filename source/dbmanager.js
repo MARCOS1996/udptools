@@ -23,42 +23,46 @@ if (parseAruments()) {
     host: configuration.mqttBroker,
     port: configuration.mqttPort,
   });
-  console.log("\CONNECTED STATE\n");
+  if (true) { // test if broker is ok
+    console.log("  Config->Connected - broker is up, trying to connect...");
+  }
+  console.log("\nCONNECTED STATE\n");
 }else {
   console.log("ERROR - Wrong arguments");
   process.exit(1);
 }
 
 mqttClient.on('connect', function () {
-  mqttClient.subscribe(['configuration','streamforwarder/configuration']);
-  console.log("  Subscribed to 'configuration' for requests");
-  console.log("  Subscribed to 'streamforwarder/configuration' for saving configs in db");
+  mqttClient.subscribe(['getconfig','setconfig']);
+  console.log("  Subscribed to 'getconfig' and 'setconfig'\n");
 })
 
 mqttClient.on('message', function (topic, message) {
 
-  console.log("MQTT Recevied: "+topic.toString()+" "+message.toString());
-
-  if (topic.toString() == "configuration") { // send configuration
-    mqttClient.publish(message.toString()+"/configuration", provideConfig(message.toString()));
-    console.log("MQTT Sent: "+message.toString()+"/configuration"+" "+provideConfig(message.toString()));
-  }else { // save config in db
-    console.log("config saved in db");
+  if (topic == "getconfig") { //message in format: <component> <id>
+    var msg = message.toString().split(" ");
+    console.log("  getconfig received from componet "+msg[0]+" with id "+msg[1]);
+    mqttClient.publish(msg[0]+"/"+msg[1]+"/configuration", provideConfig(msg[0], msg[1]));
+    console.log("    config provided: "+provideConfig(msg[0], msg[1]));
+  }else if (topic == "setconfig") {
+    console.log("not implemented");
+  }else {
+    console.log("Error with the mqtt message");
   }
 
 })
 
-function provideConfig(component){
+function provideConfig(component, id){
   switch (component) {
     case "streamforwarder": // forcing the return of the config, db to be implemented
-      return getConfigDB(component);
+      return getConfigDB(component, id);
       break;
     default:
       console.log("Error - trying to provide the config of a non recognized component");
   }
 }
 
-function getConfigDB(component){
+function getConfigDB(component, id){
   return '{ "mqttBroker":"localhost", "srcType":"rtp", "srcPort":"5004", "dstType":"rtp", "dstPort":"5008", "dstAddr":"localhost"}'
 }
 

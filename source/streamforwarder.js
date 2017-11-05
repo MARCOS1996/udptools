@@ -4,6 +4,7 @@ var RtpPacket=require("rtp-rtcp").RtpPacket;
 var fs = require('fs')
 
 configuration = {
+  id : undefined,
   mqttBroker : undefined,
   mqttPort : undefined,
   srcType : undefined,
@@ -34,19 +35,19 @@ if (parseAruments()) {
 
   mqttClient.on('connect', function (connack) { // subscribe to component topic
     console.log("\nSUBSCRIBED STATE\n");
-    mqttClient.subscribe('streamforwarder/#');
+    mqttClient.subscribe("streamforwarder/"+configuration.id+"/#");
     console.log("  Sub->Sub - requesting updated configuration");
-    mqttClient.publish('configuration', 'streamforwarder');
+    mqttClient.publish("getconfig", "streamforwarder "+configuration.id);
   });
 
   mqttClient.on('message', function (topic, message) {
-    if (topic == "streamforwarder/configuration") { // try to update config
+    if (topic == "streamforwarder/"+configuration.id+"/configuration") { // try to update config
       console.log("  Sub->StandbyOnline - Updating configuration");
       if (validateConfig(message)) { // config updated without problems
         console.log("\n  Sub->Sub - config updated");
         console.log("\nSUBSCRIBED STATE\n");
       }else { // config not updated
-        console.log("\n  Sub->Sub - config not updated");
+        console.log("\n  Sub->Sub - Warning! - config not updated");
         console.log("\nSUBSCRIBED STATE\n");
       }
     } else { // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
@@ -129,9 +130,13 @@ function parseAruments() {
 function validateConfig(config) {
   var tmpConfig = JSON.parse(config);
 
+  if (tmpConfig.id) {
+    configuration.id = tmpConfig.id;
+    console.log("\n    streamForwarder ID: "+tmpConfig.id);
+  }
   if (tmpConfig.mqttBroker) {
     configuration.mqttBroker = tmpConfig.mqttBroker;
-    console.log("\n    MQTT Broker: "+tmpConfig.mqttBroker);
+    console.log("    MQTT Broker: "+tmpConfig.mqttBroker);
   }
   if (tmpConfig.mqttPort) {
     configuration.mqttPort = tmpConfig.mqttPort;
