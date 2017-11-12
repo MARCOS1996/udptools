@@ -69,36 +69,3 @@ The database is not ready yet and the component controller sends a hardcoded con
 Used to perform various test of the implemented tools
 
         Test 1 - Tests the Stream Forwarder without using the controller, sends a specific config for local test. Now uses              transcodification, needs to be changed.
-
-# Stream Forwarder - streamforwarder.js
-
-This component works as a packet forwarder for different types of streams. The input can be rtp or udp and the same for the output. the programm when starts reads the config from the file and if the broker is available, requests the component controller the most updated config, applies it and waits for the "start" command to start forwarding packets. If the broker is not available, starts forwarding packets and will try to connect to the broker, when finally connects, requests the most updated... States diagram available on docs/sf_ diagram.png
-
-Required libraries, both available via npm
-
-        rtp-rtcp
-        mqtt
-
-Running method
-
-        $ node streamfrowarder.js -c <config_file>.json
-
-Configuration file example
-
-        {
-        "mqttBroker":"localhost",
-        "srcType":"rtp",
-        "srcPort":"5004",
-        "dstType":"udp",
-        "dstPort":"5008",
-        "dstAddr":"192.168.1.121"
-        }
-
-MQTT API
-
-        streamforwarder <start/stop>
-        streamforwarder/configuration <json_object> - Json object like the one shown previously
-
-To make changes in the configuration take effect, you must restart the service with start/stop
-
-Dev status: Only supports RTP->RTP and if the broker is not online waits for it.
