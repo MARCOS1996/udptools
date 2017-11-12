@@ -45,7 +45,7 @@ function test1() {
   const mqttmessage1 = spawn('mosquitto_pub', ["-p", "1883", "-t", "streamforwarder/1/configuration", "-m", '{ "id":"1", "mqttBroker":"localhost", "srcType":"rtp", "srcPort":"5004", "dstType":"rtp", "dstPort":"5008", "dstAddr":"localhost"}']);
   console.log('\x1b[33m%s\x1b[0m',"  Sending the most updated configuration like the ccontroller would do");
   // Configuring service via mqtt messages
-  const mqttmessage2 = spawn('mosquitto_pub', ["-p", "1883", "-t", "streamforwarder/1", "-m", 'start']);
+  const mqttmessage2 = spawn('mosquitto_pub', ["-p", "1883", "-t", "streamforwarder/1/cmd", "-m", 'start']);
   console.log('\x1b[33m%s\x1b[0m',"  Starting the forwarding via MQTT with the start command for 30 seconds");
 
   streamforwarder.stdout.on('data', function (data) {

@@ -37,7 +37,7 @@ if (parseAruments()) {
     console.log("\nSUBSCRIBED STATE\n");
     mqttClient.subscribe("streamforwarder/"+configuration.id+"/#");
     console.log("  Sub->Sub - requesting updated configuration");
-    mqttClient.publish("getconfig", "streamforwarder "+configuration.id);
+    mqttClient.publish("dbmanager/getconfig", "streamforwarder "+configuration.id);
   });
 
   mqttClient.on('message', function (topic, message) {
@@ -50,7 +50,7 @@ if (parseAruments()) {
         console.log("\n  Sub->Sub - Warning! - config not updated");
         console.log("\nSUBSCRIBED STATE\n");
       }
-    } else { // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
+    } else if (topic == "streamforwarder/"+configuration.id+"/cmd"){ // Check what of the four types of forwarding is configured and run it. avoid the message get_config that we sent previously
       if (configuration.srcType=="rtp" && configuration.dstType=="rtp") {
         rtp2rtp(message.toString());
       }else {
@@ -107,6 +107,7 @@ function rtp2rtp(command){
       break
     case "getstatus":
       "  Forw->Forw - MQTT stats - Reporting status"
+      reportStatus();
       break
     default:
       console.log("ERROR bad command");
@@ -123,6 +124,10 @@ function rtp2rtp(command){
       Sender.sendPacket(rtpPacketCopy,rtpPacketCopy.length);
     });
 };
+
+function reportStatus() {
+
+}
 
 function parseAruments() {
   var type = process.argv[2];

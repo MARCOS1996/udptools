@@ -33,19 +33,23 @@ if (parseAruments()) {
 }
 
 mqttClient.on('connect', function () {
-  mqttClient.subscribe(['getconfig','setconfig']);
-  console.log("  Subscribed to 'getconfig' and 'setconfig'\n");
+  mqttClient.subscribe(["dbmanager/setconfig","dbmanager/getconfig","dbmanager/getstatus","dbmanager/reportstatus"]);
+  console.log('  Subscribed to "dbmanager/setconfig","dbmanager/getconfig","dbmanager/getstatus" and "dbmanager/reportstatus"\n');
 })
 
 mqttClient.on('message', function (topic, message) {
 
-  if (topic == "getconfig") { //message in format: <component> <id>
+  if (topic.includes("getconfig")) { //message in format: <component> <id>
     var msg = message.toString().split(" ");
     console.log("  getconfig received from componet "+msg[0]+" with id "+msg[1]);
     mqttClient.publish(msg[0]+"/"+msg[1]+"/configuration", provideConfig(msg[0], msg[1]));
     console.log("    config provided: "+provideConfig(msg[0], msg[1]));
-  }else if (topic == "setconfig") {
-    console.log("not implemented");
+  }else if (topic.includes("setconfig")) {
+    console.log("set config not implemented");
+  }else if (topic.includes("getstatus")) {
+    console.log("gs not implemented");
+  }else if (topic.includes("reportstatus")) {
+    console.log("rs not implemented");
   }else {
     console.log("Error with the mqtt message");
   }
