@@ -22,7 +22,7 @@ Susbscribed to topics:
 
 * **dbmanager/setconfig/component_type/id** <config> - for saving configurations in json format
 
-* **dbmanager/setstatus/component_type/id** <status> - for saving status in json format
+* **dbmanager/reportstatus/component_type/id** <status> - for reporting status in json format
 
 ### Dev status
 
