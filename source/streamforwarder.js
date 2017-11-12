@@ -89,6 +89,25 @@ function rtp2rtp(command){
         Sender.close();
       }
       break;
+    case "setconfig":
+      console.log("  Forw->Forw - MQTT Recevied setconfig");
+      console.log("\nFORWARDING STATE\n");
+      if (Listener!=undefined) { // only close if Listener is running
+        Listener.close();
+      }
+      if (Sender!=undefined) { // only close if Listener is running
+        Sender.close();
+      }
+      Listener=new RtpSession(configuration.srcPort); // Create a listener
+      Sender=new RtpSession(0); // Pick a random port, it won't be used, create a sender
+      Sender.setRemoteAddress(configuration.dstPort,configuration.dstAddr); // set the target for the sender
+      break
+    case "getconfig":
+      // Not implemented
+      break
+    case "getstatus":
+      "  Forw->Forw - MQTT stats - Reporting status"
+      break
     default:
       console.log("ERROR bad command");
   }
