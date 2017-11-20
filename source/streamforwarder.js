@@ -126,7 +126,7 @@ function rtp2rtp(command){
 };
 
 function reportStatus() {
-
+  mqttClient.publish("status/streamforwarder/"+configuration.id, "ok");
 }
 
 function parseAruments() {
